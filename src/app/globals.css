@@ -1,6 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -12,6 +14,11 @@ body {
   max-width: 1200px;
   width: calc(100vw - 4rem);
   margin: 2rem auto;
+}
+
+button {
+  font-size: inherit;
+  font-family: inherit;
 }
 
 .error-msg {
@@ -42,6 +49,14 @@ body {
 .message-input:focus {
   border-color: hsl(235, 100%, 67%);
   outline: none;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
 }
 
 .comment-stack {
@@ -89,6 +104,10 @@ body {
   transition: background-color 100ms ease-in-out;
 }
 
+.hide {
+  display: none;
+}
+
 .btn {
   --hue: 235;
   --color: hsl(var(--hue), 100%, 67%);
@@ -112,6 +131,10 @@ body {
   padding: 0.25em;
   display: flex;
   align-items: center;
+}
+
+.mr-1 {
+  margin-right: 0.25em;
 }
 
 .icon-btn:hover,
@@ -169,6 +192,10 @@ body {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
+}
+
+.ml-3 {
+  margin-left: 1.5rem;
 }
 
 .btn[disabled] {
