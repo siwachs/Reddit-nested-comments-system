@@ -1,0 +1,3 @@
+npx prisma migrate (Create migration file everytime we migrate it update a client code with generator)
+
+Prisma client use to access CRUD operations

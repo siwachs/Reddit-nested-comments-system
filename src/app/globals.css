@@ -2,32 +2,175 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.4;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.container {
+  max-width: 1200px;
+  width: calc(100vw - 4rem);
+  margin: 2rem auto;
+}
+
+.error-msg {
+  color: hsl(0, 100%, 67%);
+}
+
+.comments-title {
+  margin-bottom: 0.5rem;
+}
+
+.comment-form-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.message-input {
+  flex-grow: 1;
+  resize: none;
+  height: 70px;
+  border-radius: 0.5em;
+  padding: 0.5em;
+  font-size: inherit;
+  font-family: inherit;
+  border: 2px solid hsl(235, 50%, 74%);
+  line-height: 1.4;
+}
+
+.message-input:focus {
+  border-color: hsl(235, 100%, 67%);
+  outline: none;
+}
+
+.comment-stack {
+  margin: 0.5rem 0;
+}
+
+.comment-stack:last-child {
+  margin-bottom: 0;
+}
+
+.nested-comments {
+  padding-left: 0.5rem;
+  flex-grow: 1;
+}
+
+.nested-comments-stack {
+  display: flex;
+}
+
+.collapse-line {
+  border: none;
+  background: none;
+  padding: 0;
+  width: 15px;
+  margin-top: 0.5rem;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transform: translateX(-50%);
+}
+
+.collapse-line:hover::before,
+.collapse-line:focus-visible::before {
+  background-color: hsl(235, 100%, 60%);
+}
+
+.collapse-line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background-color: hsl(235, 50%, 74%);
+  transition: background-color 100ms ease-in-out;
+}
+
+.btn {
+  --hue: 235;
+  --color: hsl(var(--hue), 100%, 67%);
+  padding: 0.5em 1em;
+  background: var(--color);
+  border: none;
+  color: white;
+  border-radius: 0.5em;
+  font-size: 0.75em;
+  cursor: pointer;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  --color: hsl(var(--hue), 100%, 74%);
+}
+
+.btn.icon-btn {
+  background: none;
+  color: var(--color);
+  padding: 0.25em;
+  display: flex;
+  align-items: center;
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  --color: hsl(var(--hue), 100%, 74%);
+}
+
+.icon-btn-active,
+.icon-btn.danger {
+  --hue: 0;
+}
+
+.icon-btn-active {
+  position: relative;
+}
+
+.icon-btn-active::before {
+  content: "\00D7";
+  position: absolute;
+  font-size: 0.75em;
+  width: 1em;
+  height: 1em;
+  color: white;
+  background-color: var(--color);
+  border-radius: 50%;
+  bottom: 0.1em;
+  right: 0.1em;
+}
+
+.comment {
+  padding: 0.5rem;
+  border: 1px solid hsl(235, 100%, 90%);
+  border-radius: 0.5rem;
+}
+
+.comment .header {
+  color: hsl(235, 50%, 67%);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+  font-size: 0.75em;
+}
+
+.comment .header .name {
+  font-weight: bold;
+}
+
+.comment .message {
+  white-space: pre-wrap;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.comment .footer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn[disabled] {
+  --color: hsl(var(--hue), 20%, 74%);
 }
