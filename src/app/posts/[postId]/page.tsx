@@ -1,4 +1,5 @@
 import { getPost } from "@/lib/postService";
+import CommentList from "../_components/commentList";
 
 export default async function Post(req: {
   params: { postId: string; searchParams: {} };
@@ -17,10 +18,6 @@ export default async function Post(req: {
     return groups;
   };
 
-  const getReplies = (parentId: string = "null") => {
-    return getCommentsByParentId()[parentId];
-  };
-
   return (
     <main className="container">
       <h1>{post?.title}</h1>
@@ -29,11 +26,7 @@ export default async function Post(req: {
       <h3 className="comments-title">Comments</h3>
       <section>
         <div className="mt-4">
-          {getReplies().map((comment) => (
-            <div key={comment.id} className="comment-stack">
-              <div>{comment.message}</div>
-            </div>
-          ))}
+          <CommentList commentsGroup={getCommentsByParentId()} />
         </div>
       </section>
     </main>
