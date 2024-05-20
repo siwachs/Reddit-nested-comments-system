@@ -1,16 +1,18 @@
 import { getPost } from "@/lib/postService";
-import CommentList from "../_components/commentList";
+import CommentList from "../_components/CommentListWrapper";
 
-export default async function Post(req: {
-  params: { postId: string; searchParams: {} };
-}) {
+export default async function Post(
+  req: Readonly<{
+    params: { postId: string; searchParams: {} };
+  }>
+) {
   const post = await getPost(req.params.postId);
 
   const getCommentsByParentId = () => {
     const groups: { [key: string]: any[] } = {};
 
     post?.comments.forEach((comment) => {
-      const parentIdString = comment.parentId?.toString() ?? "null";
+      const parentIdString = comment.parentId?.toString() ?? "root";
       groups[parentIdString] ||= [];
       groups[parentIdString].push(comment);
     });
