@@ -1,28 +1,22 @@
 import Link from "next/link";
 
-type ParsedPosts = {
-  error: boolean;
-  postsLinks: {
-    id: string;
-    title: string;
-  }[];
-};
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export default async function Home() {
-  const baseUrl = process.env.BASE_URL;
-  const postsEndpoint = process.env.POSTS_ENDPOINT;
-  const postsResponse = await fetch(
-    `${baseUrl}${postsEndpoint}?getPostsLinks=true`
-  );
-  const parsedPosts: ParsedPosts = await postsResponse.json();
-  const { error, postsLinks } = parsedPosts;
+  const posts = await prisma.post.findMany({
+    select: {
+      id: true,
+      title: true,
+    },
+  });
 
   return (
     <main className="container">
-      {error || postsLinks.length === 0 ? (
+      {!posts ? (
         <h1 className="error-msg">No Posts found.</h1>
       ) : (
-        postsLinks.map((post, index) => (
+        posts.map((post, index) => (
           <h1 key={index}>
             <Link href={`/posts/${post.id}`}>{post.title}</Link>
           </h1>
