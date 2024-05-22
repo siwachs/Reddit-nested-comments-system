@@ -1,45 +1,39 @@
 import { useState } from "react";
+import { usePost } from "@/context/postContext";
 import { FaEdit, FaHeart, FaReply, FaTrash } from "react-icons/fa";
 import IconButton from "./iconbutton";
+import CommentForm from "./commentForm";
 
-const CommentListWrapper: React.FC<{ comments: CommentObj[] }> = ({
-  comments,
-}) => {
-  const getCommentsByParentId = () => {
-    const groups: { [key: string]: CommentObj[] } = {};
-
-    comments.forEach((comment) => {
-      const parentIdString = comment.parentId?.toString() || "root";
-      groups[parentIdString] ||= [];
-      groups[parentIdString].push(comment);
-    });
-
-    return groups;
-  };
-
-  const getReplies = (parentId = "root") => {
-    return getCommentsByParentId()[parentId];
-  };
-  const rootComments = getReplies();
+const Post = () => {
+  const { post, rootComments, addCommentLoading, addCommentError, addComment } =
+    usePost();
 
   return (
-    <section>
-      {rootComments && rootComments.length && (
-        <div className="mt-4">
-          <CommentList comments={rootComments} getReplies={getReplies} />
-        </div>
-      )}
-    </section>
+    <>
+      <h1>{post?.title}</h1>
+      <article>{post?.body}</article>
+      <h3 className="comments-title">Comments</h3>
+      <section>
+        <CommentForm
+          autoFocus
+          loading={addCommentLoading}
+          error={addCommentError}
+          onSubmit={addComment}
+        />
+        {rootComments.length && (
+          <div className="mt-4">
+            <CommentList comments={rootComments} />
+          </div>
+        )}
+      </section>
+    </>
   );
 };
 
-const CommentList: React.FC<{
-  comments: CommentObj[];
-  getReplies: (parentId: string) => CommentObj[] | undefined;
-}> = ({ comments, getReplies }) => {
+const CommentList: React.FC<{ comments: CommentObj[] }> = ({ comments }) => {
   return comments.map((comment) => (
     <div key={comment.id} className="comment-stack">
-      <Comment comment={comment} getReplies={getReplies} />
+      <Comment comment={comment} />
     </div>
   ));
 };
@@ -49,10 +43,8 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
   timeStyle: "short",
 });
 
-const Comment: React.FC<{
-  comment: CommentObj;
-  getReplies: (parentId: string) => CommentObj[] | undefined;
-}> = ({ comment, getReplies }) => {
+const Comment: React.FC<{ comment: CommentObj }> = ({ comment }) => {
+  const { getReplies } = usePost();
   const [areChildrenHidden, setAreChildrenHidden] = useState(true);
   const childComments = getReplies(comment.id);
 
@@ -78,7 +70,7 @@ const Comment: React.FC<{
         </div>
       </div>
 
-      {childComments && childComments.length && (
+      {childComments.length > 0 && (
         <>
           <div
             className={`nested-comments-stack ${
@@ -91,7 +83,7 @@ const Comment: React.FC<{
               aria-label="Hide Replies"
             />
             <div className="nested-comments">
-              <CommentList comments={childComments} getReplies={getReplies} />
+              <CommentList comments={childComments} />
             </div>
           </div>
 
@@ -107,4 +99,4 @@ const Comment: React.FC<{
   );
 };
 
-export default CommentListWrapper;
+export default Post;
