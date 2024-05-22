@@ -11,4 +11,4 @@ type CommentObj = {
   user: UserObj;
 };
 
-type PostObj = { title: string; body: string; comments: CommentObj[] };
+type PostObj = { title: string; body: string };

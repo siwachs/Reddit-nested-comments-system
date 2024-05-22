@@ -6,16 +6,31 @@ const CommentForm: React.FC<{
   error: string | undefined;
   autoFocus?: boolean;
   onSubmit: any;
-}> = ({ initialMessage = "", loading, error, autoFocus = false, onSubmit }) => {
+  parentId?: string | null;
+  setIsReplying?: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({
+  initialMessage = "",
+  loading,
+  error,
+  autoFocus = false,
+  onSubmit,
+  parentId,
+  setIsReplying,
+}) => {
   const [message, setMessage] = useState(initialMessage);
 
-  const addComment = (e: React.FormEvent<HTMLFormElement>) => {
+  const makeComment = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(message, null).then(() => setMessage(""));
+    onSubmit(message, parentId).then(() => {
+      setMessage("");
+      if (setIsReplying) {
+        setIsReplying(false);
+      }
+    });
   };
 
   return (
-    <form onSubmit={addComment}>
+    <form onSubmit={makeComment}>
       <div className="comment-form-row">
         <textarea
           autoFocus={autoFocus}
@@ -27,6 +42,7 @@ const CommentForm: React.FC<{
           {loading ? "Loading..." : "Post"}
         </button>
       </div>
+
       <div className="error-msg">{error}</div>
     </form>
   );

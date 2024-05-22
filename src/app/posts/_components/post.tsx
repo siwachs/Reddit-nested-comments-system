@@ -5,29 +5,43 @@ import IconButton from "./iconbutton";
 import CommentForm from "./commentForm";
 
 const Post = () => {
-  const { post, rootComments, addCommentLoading, addCommentError, addComment } =
-    usePost();
+  const {
+    post,
+    postLoading,
+    postError,
+    rootComments,
+    makeCommentLoading,
+    makeCommentError,
+    makeComment,
+  } = usePost()!;
 
-  return (
-    <>
-      <h1>{post?.title}</h1>
-      <article>{post?.body}</article>
-      <h3 className="comments-title">Comments</h3>
-      <section>
-        <CommentForm
-          autoFocus
-          loading={addCommentLoading}
-          error={addCommentError}
-          onSubmit={addComment}
-        />
-        {rootComments.length && (
-          <div className="mt-4">
-            <CommentList comments={rootComments} />
-          </div>
-        )}
-      </section>
-    </>
-  );
+  function getMainContent() {
+    if (postLoading) return <h1 className="comments-title">Loading...</h1>;
+    if (postError) return <h1 className="error-msg">{postError}</h1>;
+
+    return (
+      <>
+        <h1>{post?.title}</h1>
+        <article>{post?.body}</article>
+        <h3 className="comments-title">Comments</h3>
+        <section>
+          <CommentForm
+            autoFocus
+            loading={makeCommentLoading}
+            error={makeCommentError}
+            onSubmit={makeComment}
+          />
+          {rootComments.length > 0 && (
+            <div className="mt-4">
+              <CommentList comments={rootComments} />
+            </div>
+          )}
+        </section>
+      </>
+    );
+  }
+
+  return <main className="container">{getMainContent()}</main>;
 };
 
 const CommentList: React.FC<{ comments: CommentObj[] }> = ({ comments }) => {
@@ -44,7 +58,9 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 });
 
 const Comment: React.FC<{ comment: CommentObj }> = ({ comment }) => {
-  const { getReplies } = usePost();
+  const { makeCommentLoading, makeCommentError, makeComment, getReplies } =
+    usePost();
+  const [isReplying, setIsReplying] = useState(false);
   const [areChildrenHidden, setAreChildrenHidden] = useState(true);
   const childComments = getReplies(comment.id);
 
@@ -64,11 +80,29 @@ const Comment: React.FC<{ comment: CommentObj }> = ({ comment }) => {
           <IconButton Icon={<FaHeart />} aria-label="Like">
             2
           </IconButton>
-          <IconButton Icon={<FaReply />} aria-label="Reply" />
+          <IconButton
+            onClick={() => setIsReplying((prev) => !prev)}
+            isActive={isReplying}
+            Icon={<FaReply />}
+            aria-label={isReplying ? "Cancel Reply" : "Reply"}
+          />
           <IconButton Icon={<FaEdit />} aria-label="Edit" />
           <IconButton Icon={<FaTrash />} aria-label="Delete" color="danger" />
         </div>
       </div>
+
+      {isReplying && (
+        <div className="mt-1 ml-3">
+          <CommentForm
+            autoFocus
+            loading={makeCommentLoading}
+            error={makeCommentError}
+            onSubmit={makeComment}
+            parentId={comment.id}
+            setIsReplying={setIsReplying}
+          />
+        </div>
+      )}
 
       {childComments.length > 0 && (
         <>
@@ -82,6 +116,8 @@ const Comment: React.FC<{ comment: CommentObj }> = ({ comment }) => {
               className="collapse-line"
               aria-label="Hide Replies"
             />
+
+            {/* Child comments recursive */}
             <div className="nested-comments">
               <CommentList comments={childComments} />
             </div>
