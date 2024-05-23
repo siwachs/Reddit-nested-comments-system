@@ -7,7 +7,7 @@ const CommentForm: React.FC<{
   autoFocus?: boolean;
   onSubmit: any;
   parentId?: string | null;
-  setIsReplying?: React.Dispatch<React.SetStateAction<boolean>>;
+  closeForm?: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({
   initialMessage = "",
   loading,
@@ -15,7 +15,7 @@ const CommentForm: React.FC<{
   autoFocus = false,
   onSubmit,
   parentId,
-  setIsReplying,
+  closeForm,
 }) => {
   const [message, setMessage] = useState(initialMessage);
 
@@ -23,9 +23,7 @@ const CommentForm: React.FC<{
     e.preventDefault();
     onSubmit(message, parentId).then(() => {
       setMessage("");
-      if (setIsReplying) {
-        setIsReplying(false);
-      }
+      closeForm && closeForm(false);
     });
   };
 

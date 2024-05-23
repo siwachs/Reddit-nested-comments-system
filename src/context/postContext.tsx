@@ -10,6 +10,7 @@ import {
 type ContextType = {
   id: string;
   makeComment: (message: string, parentId: string | null) => void;
+  editComment: (message: string, commentId: string) => void;
   makeCommentLoading: boolean;
   makeCommentError: string | undefined;
   postLoading: boolean;
@@ -110,7 +111,7 @@ export function PostProvider({
 
       try {
         setMakeCommentLoading(true);
-        const commentResponse = await fetch(`/api/comments/${id}`, {
+        const commentResponse = await fetch(`/api/posts/${id}/comments`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message, parentId }),
@@ -133,6 +134,41 @@ export function PostProvider({
     [id, makeCommentLoading]
   );
 
+  const editComment = useCallback(
+    async (message: string, commentId: string) => {
+      if (makeCommentLoading || !message.trim() || !commentId) return;
+
+      try {
+        setMakeCommentLoading(true);
+        const commentResponse = await fetch(
+          `/api/posts/${id}/comments/${commentId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message }),
+          }
+        );
+
+        if (commentResponse.status === 400) {
+          throw new Error("Message is required.");
+        } else if (!commentResponse.ok) {
+          throw new Error("Network response failed.");
+        }
+
+        setComments((prev) =>
+          prev.map((comment) =>
+            comment.id === commentId ? { ...comment, message } : comment
+          )
+        );
+      } catch (error: any) {
+        setMakeCommentError(error.message);
+      } finally {
+        setMakeCommentLoading(false);
+      }
+    },
+    [id, makeCommentLoading]
+  );
+
   const contextValue = useMemo(
     () => ({
       id,
@@ -145,6 +181,7 @@ export function PostProvider({
       makeCommentError,
       makeComment,
       comments,
+      editComment,
     }),
     [
       id,
@@ -156,6 +193,7 @@ export function PostProvider({
       makeCommentError,
       makeComment,
       comments,
+      editComment,
     ]
   );
 

@@ -58,10 +58,16 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 });
 
 const Comment: React.FC<{ comment: CommentObj }> = ({ comment }) => {
-  const { makeCommentLoading, makeCommentError, makeComment, getReplies } =
-    usePost();
+  const {
+    makeCommentLoading,
+    makeCommentError,
+    makeComment,
+    getReplies,
+    editComment,
+  } = usePost();
   const [isReplying, setIsReplying] = useState(false);
-  const [areChildrenHidden, setAreChildrenHidden] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [areChildrenHidden, setAreChildrenHidden] = useState(false);
   const childComments = getReplies(comment.id);
 
   return (
@@ -74,7 +80,19 @@ const Comment: React.FC<{ comment: CommentObj }> = ({ comment }) => {
           </span>
         </div>
 
-        <div className="message">{comment.message}</div>
+        {isEditing ? (
+          <CommentForm
+            autoFocus
+            loading={makeCommentLoading}
+            error={makeCommentError}
+            onSubmit={editComment}
+            initialMessage={comment.message}
+            closeForm={setIsEditing}
+            parentId={comment.id}
+          />
+        ) : (
+          <div className="message">{comment.message}</div>
+        )}
 
         <div className="footer">
           <IconButton Icon={<FaHeart />} aria-label="Like">
@@ -86,7 +104,12 @@ const Comment: React.FC<{ comment: CommentObj }> = ({ comment }) => {
             Icon={<FaReply />}
             aria-label={isReplying ? "Cancel Reply" : "Reply"}
           />
-          <IconButton Icon={<FaEdit />} aria-label="Edit" />
+          <IconButton
+            onClick={() => setIsEditing((prev) => !prev)}
+            isActive={isEditing}
+            Icon={<FaEdit />}
+            aria-label={isEditing ? "Cancel Edit" : "Edit"}
+          />
           <IconButton Icon={<FaTrash />} aria-label="Delete" color="danger" />
         </div>
       </div>
@@ -99,7 +122,7 @@ const Comment: React.FC<{ comment: CommentObj }> = ({ comment }) => {
             error={makeCommentError}
             onSubmit={makeComment}
             parentId={comment.id}
-            setIsReplying={setIsReplying}
+            closeForm={setIsReplying}
           />
         </div>
       )}
